@@ -11,6 +11,7 @@
   "dependencies": {
     "@next/font": "13.1.1",
     "clsx": "^1.2.1",
+    "immutability-helper": "^3.1.1",
     "ipfs": "0.59",
     "ipfs-core": "^0.17.0",
     "next": "13.1.1",

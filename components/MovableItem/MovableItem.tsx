@@ -11,21 +11,39 @@ const MovableItem = ({
   setItems,
 }: any) => {
   const changeItemColumn = (currentItem, columnName) => {
+    console.log(
+      '🚀 ~ file: MovableItem.tsx:14 ~ changeItemColumn ~ columnName',
+      columnName
+    )
+
     setItems((prevState) => {
-      return prevState.map((e) => {
-        return {
-          ...e,
-          column: e.name === currentItem.name ? columnName : e.column,
-        }
-      })
+      return prevState
+        .sort(({ column: a }, { column: b }) => {
+          if (a < b) {
+            return -1
+          }
+          if (a > b) {
+            return 1
+          }
+
+          return 0
+        })
+        .map((item) => {
+          return {
+            ...item,
+            column: item.name === currentItem.name ? columnName : item.column,
+          }
+        })
     })
   }
 
   const ref = useRef(null)
 
   const [, drop] = useDrop({
-    accept: 'Our first type',
-    hover(item, monitor) {
+    accept: ItemTypes.CARD,
+    hover(item: any, monitor) {
+      console.log('🚀 ~ file: MovableItem.tsx:45 ~ hover ~ item', item)
+
       if (!ref.current) {
         return
       }
@@ -66,22 +84,19 @@ const MovableItem = ({
   })
 
   const [{ isDragging }, drag] = useDrag({
-    item: { index, name, currentColumnName, type: 'Our first type' },
+    item: { index, name, currentColumnName, type: ItemTypes.CARD },
     end: (item, monitor) => {
-      const dropResult = monitor.getDropResult()
+      const dropResult: any = monitor.getDropResult()
 
       if (dropResult) {
         const { name } = dropResult
-        const { DO_IT, IN_PROGRESS, AWAITING_REVIEW, DONE } = COLUMN_NAMES
+        const { DO_IT, IN_PROGRESS, AWAITING_REVIEW } = COLUMN_NAMES
         switch (name) {
           case IN_PROGRESS:
             changeItemColumn(item, IN_PROGRESS)
             break
           case AWAITING_REVIEW:
             changeItemColumn(item, AWAITING_REVIEW)
-            break
-          case DONE:
-            changeItemColumn(item, DONE)
             break
           case DO_IT:
             changeItemColumn(item, DO_IT)
@@ -98,7 +113,7 @@ const MovableItem = ({
   })
 
   const opacity = isDragging ? 0.1 : 1
-  const className = `${isDragging ? 'rotate-12' : ''}`
+  // const className = `${isDragging ? 'rotate-12' : ''}`
 
   drag(drop(ref))
 
