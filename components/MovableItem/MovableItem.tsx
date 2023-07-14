@@ -1,6 +1,6 @@
 import { useRef } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
-import { COLUMN_NAMES, ItemTypes } from '../../constants'
+import { COLUMN_IDS, ItemTypes } from '../../constants'
 import Card from './Card'
 
 const MovableItem = ({
@@ -90,20 +90,23 @@ const MovableItem = ({
 
       if (dropResult) {
         const { name } = dropResult
-        const { DO_IT, IN_PROGRESS, AWAITING_REVIEW } = COLUMN_NAMES
-        switch (name) {
-          case IN_PROGRESS:
-            changeItemColumn(item, IN_PROGRESS)
-            break
-          case AWAITING_REVIEW:
-            changeItemColumn(item, AWAITING_REVIEW)
-            break
-          case DO_IT:
-            changeItemColumn(item, DO_IT)
-            break
-          default:
-            break
+        if (name) {
+          changeItemColumn(item, COLUMN_IDS[name])
         }
+        // const { DO_IT, IN_PROGRESS, AWAITING_REVIEW } = COLUMN_NAMES
+        // switch (name) {
+        //   case COLUMN_IDS.DO_IT:
+        //     changeItemColumn(item, COLUMN_IDS.DO_IT)
+        //     break
+        //   case COLUMN_IDS.IN_PROGRESS:
+        //     changeItemColumn(item, COL)
+        //     break
+        //   case DO_IT:
+        //     changeItemColumn(item, DO_IT)
+        //     break
+        //   default:
+        //     break
+        // }
       }
     },
     collect: (monitor) => ({
@@ -119,7 +122,7 @@ const MovableItem = ({
 
   return (
     <div ref={ref} style={{ opacity }}>
-      <Card name={name} />
+      <Card title={name} />
     </div>
   )
 }

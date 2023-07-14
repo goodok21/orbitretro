@@ -1,10 +1,13 @@
-import { PropsWithChildren } from 'react'
 import { useDrop } from 'react-dnd'
-import { COLUMN_NAMES, ItemTypes } from '../../constants'
+import update from 'immutability-helper'
+import { useRecoilState } from 'recoil'
+import MovableItem from 'components/MovableItem'
+import { cardListState } from 'recoil_state'
+import { Column, ItemTypes } from '../../constants'
 
-type ColumnProps = PropsWithChildren<Readonly<{ title: string }>>
+const Column: React.FC<Column> = ({ id, title }) => {
+  const [cards, setCards] = useRecoilState(cardListState)
 
-const Column: React.FC<ColumnProps> = ({ children, title }) => {
   const [{ isOver, canDrop }, drop] = useDrop({
     accept: ItemTypes.CARD,
     drop: () => ({ name: title }),
@@ -12,34 +15,20 @@ const Column: React.FC<ColumnProps> = ({ children, title }) => {
       isOver: monitor.isOver(),
       canDrop: monitor.canDrop(),
     }),
-    // Override monitor.canDrop() function
-    // canDrop: (item: any) => {
-    //   const { DO_IT, IN_PROGRESS, AWAITING_REVIEW } = COLUMN_NAMES
-    //   const { currentColumnName } = item
-
-    //   return (
-    //     currentColumnName === title ||
-    //     (currentColumnName === DO_IT && title === IN_PROGRESS) ||
-    //     (currentColumnName === IN_PROGRESS &&
-    //       (title === DO_IT || title === AWAITING_REVIEW)) ||
-    //     (currentColumnName === AWAITING_REVIEW &&
-    //       (title === IN_PROGRESS || title === DONE)) ||
-    //     (currentColumnName === DONE && title === AWAITING_REVIEW)
-    //   )
-    // },
   })
 
-  // const getBackgroundColor = () => {
-  //   if (isOver) {
-  //     if (canDrop) {
-  //       return 'rgb(188,251,255)'
-  //     } else if (!canDrop) {
-  //       return 'rgb(255,188,188)'
-  //     }
-  //   } else {
-  //     return ''
-  //   }
-  // }
+  const moveCardHandler = (dragIndex, hoverIndex) => {
+    const dragItem = cards[dragIndex]
+
+    setCards(
+      update(cards, {
+        $splice: [
+          [dragIndex, 1],
+          [hoverIndex, 0, dragItem],
+        ],
+      })
+    )
+  }
 
   return (
     <div
@@ -53,7 +42,19 @@ const Column: React.FC<ColumnProps> = ({ children, title }) => {
           <span className="text-brand text-lg">1</span>
         </div>
       </div>
-      {children}
+      {cards
+        .filter((card) => card.column === id)
+        .map((card, index) => (
+          <MovableItem
+            // FIXME: key
+            key={card.text}
+            name={card.text}
+            index={index}
+            currentColumnName={id}
+            // setItems={setItems}
+            moveCardHandler={moveCardHandler}
+          />
+        ))}
     </div>
   )
 }

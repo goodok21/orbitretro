@@ -39,6 +39,18 @@ module.exports = {
         '4xl': '2rem',
       },
     },
+    keyframes: {
+      spin: {
+        to: { transform: 'rotate(1turn)' },
+      },
+      'spin-reverse': {
+        to: { transform: 'rotate(-1turn)' },
+      },
+    },
+    animation: {
+      'spin-reverse-slower': 'spin-reverse 6s linear infinite',
+      'spin-slow': 'spin 4s linear infinite',
+    },
   },
   plugins: [require('@tailwindcss/forms')],
 }
