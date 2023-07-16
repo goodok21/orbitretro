@@ -1,10 +1,11 @@
 import { useRouter } from 'next/router'
+import { v4 as uuidv4 } from 'uuid'
 
 export default function Home() {
   const router = useRouter()
 
   const handleCreateNewBoard = () => {
-    const boardId = Math.random().toString(36).slice(2)
+    const boardId = uuidv4()
     router.push(`/board/${boardId}`)
   }
 
@@ -15,7 +16,7 @@ export default function Home() {
           <div className="lg:grid lg:grid-cols-12 lg:gap-x-8 lg:gap-y-20">
             <div className="relative z-10 mx-auto max-w-2xl lg:col-span-7 lg:max-w-none lg:pt-6 xl:col-span-6">
               <h1 className="text-4xl font-medium tracking-tight text-gray-900">
-                Decentralized team <b>retrospective</b> board
+                Decentralized <b>retrospective</b> board
               </h1>
               <p className="mt-6 text-lg text-gray-600">
                 Orbit Retro is a digital board optimized for software and

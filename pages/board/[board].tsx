@@ -1,41 +1,87 @@
 import Head from 'next/head'
 
-import { RecoilRoot } from 'recoil'
-import ColumnsContainer from 'components/ColumnsContainer'
 import { useRouter } from 'next/router'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { gunDB } from 'lib'
+import { v4 as uuidv4 } from 'uuid'
 
 export default function Home() {
   const router = useRouter()
   const boardId = router.query.board
   const boardKey = `board:${boardId}`
 
-  // const user = gun.user && gun.user();
+  const [cards, setCards] = useState([])
+
   useEffect(() => {
     if (!boardId) {
       return
     }
 
     if (typeof window !== 'undefined') {
-      console.log('🚀 ~ file: [board].tsx:23 ~ useEffect ~ boardKey:', boardKey)
+      gunDB
+        .get(boardKey)
+        .get('cards')
+        .map()
+        .on((card, key) => {
+          if (!card.id) {
+            return
+          }
 
-      gunDB.get(boardKey).put({
-        name: 'test board',
-      })
-
-      gunDB.get(boardKey).on((data, key) => {
-        console.log('realtime updates:', data, key)
-      }, true)
+          setCards((prevState) => [...new Set([...prevState, card])])
+        }, true)
 
       return () => {
-        gunDB.get(boardKey).off()
+        gunDB.get(boardKey).get('cards').off()
       }
     }
   }, [boardId, boardKey])
 
-  const handleClick = () => {
-    gunDB.get(boardKey).get('live').put(new Date().valueOf())
+  const handleAddCard = () => {
+    const cardId = uuidv4()
+
+    const cardData = {
+      id: cardId,
+      title: 'card1',
+      description: 'card1 description',
+      time: new Date().valueOf(),
+    }
+
+    // const card = gunDB.get(boardKey).get('cards').put(cardData)
+    const card = gunDB.get(boardKey).get(`card:${cardId}`).put(cardData)
+
+    // const card = gunDB.get(`${boardKey}:cards`).put()
+    // console.log('🚀 ~ file: [board].tsx:52 ~ handleAddCard ~ card:', card)
+    gunDB.get(boardKey).get('cards').set(card)
+  }
+
+  const handleUpdateCard = (card) => {
+    console.log(card['_']['#'])
+    gunDB.get(card['_']['#']).put({ title: 'card updated 2' })
+  }
+
+  const handleRemoveCard = (card) => {
+    console.log(card['_']['#'])
+    gunDB
+      .get(card['_']['#'])
+      .put({ id: null, title: null, description: null, time: null })
+
+    setCards((prevState) => prevState.filter(({ id }) => id !== card.id))
+  }
+
+  const handleClearBoard = () => {
+    gunDB
+      .get(boardKey)
+      .get('cards')
+      .map()
+      .once((data) => {
+        console.log('🚀 ~ file: [board].tsx:74 ~ cardsIds ~ data:', data)
+      })
+
+    // gunDB
+    //   .get(card['_']['#'])
+    //   .put({ id: null, title: null, description: null, time: null })
+
+    // gunDB.get(boardKey).get('cards').put(null)
   }
 
   return (
@@ -44,11 +90,30 @@ export default function Home() {
         <title>Orbit Retro | {boardId}</title>
       </Head>
 
-      <button onClick={handleClick}>change</button>
+      <div className="flex flex-col">
+        <button onClick={handleAddCard}>handleAddCard</button>
+        <button onClick={handleClearBoard}>handleClearBoard</button>
 
-      <RecoilRoot>
-        <ColumnsContainer />
-      </RecoilRoot>
+        <ul className="flex flex-col gap-4">
+          {cards.map((card) => (
+            <li key={card.id}>
+              <h1>{card.title}</h1>
+              <p>{card.description}</p>
+              <p>{card.time}</p>
+
+              <button
+                className="px-6 py-2 m-4 border-amber-400 border-2 rounded-lg"
+                onClick={() => handleUpdateCard(card)}
+              >
+                update
+              </button>
+              <button onClick={() => handleRemoveCard(card)}>remove</button>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* <ColumnsContainer /> */}
     </>
   )
 }
