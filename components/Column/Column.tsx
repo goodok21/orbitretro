@@ -3,10 +3,12 @@ import update from 'immutability-helper'
 import { useRecoilState } from 'recoil'
 import MovableItem from 'components/MovableItem'
 import { cardListState } from 'recoil_state'
-import { Column, ItemTypes } from '../../constants'
+import { ItemTypes } from '../../constants'
+import clsx from 'clsx'
+import { ICard, IColumn } from 'types'
 
-const Column: React.FC<Column> = ({ id, title }) => {
-  const [cards, setCards] = useRecoilState(cardListState)
+const Column: React.FC<IColumn> = ({ id, title }) => {
+  const [cards, setCards] = useRecoilState<Array<ICard>>(cardListState)
 
   const [{ isOver, canDrop }, drop] = useDrop({
     accept: ItemTypes.CARD,
@@ -33,26 +35,28 @@ const Column: React.FC<Column> = ({ id, title }) => {
   return (
     <div
       ref={drop}
-      className="flex flex-col p-4 gap-6 rounded-xl bg-brandLighter"
-      // style={{ backgroundColor: getBackgroundColor() }}
+      className={clsx(
+        'flex flex-col p-4 gap-6 rounded-xl bg-brandLighter border-2 border-transparent transition-all',
+        isOver && 'border-slate-300 bg-brandLight'
+      )}
     >
       <div className="flex justify-between">
         <h2 className="text-xl font-medium">{title}</h2>
         <div className="flex justify-center align-middle bg-brandLight rounded-md px-2">
-          <span className="text-brand text-lg">1</span>
+          <span className="text-brand text-lg">
+            {cards.filter(({ column }) => column === id).length}
+          </span>
         </div>
       </div>
+
       {cards
         .filter((card) => card.column === id)
         .map((card, index) => (
           <MovableItem
-            // FIXME: key
-            key={card.text}
-            name={card.text}
+            key={card.id}
             index={index}
-            currentColumnName={id}
-            // setItems={setItems}
             moveCardHandler={moveCardHandler}
+            {...card}
           />
         ))}
     </div>

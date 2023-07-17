@@ -1,15 +1,6 @@
-export enum COLUMN_IDS {
-  DO_IT,
-  IN_PROGRESS,
-  AWAITING_REVIEW,
-}
+import { COLUMN_IDS, ICard, IColumn } from 'types'
 
-export type Column = {
-  id: COLUMN_IDS
-  title: string
-}
-
-export const COLUMN_NAMES: Array<Column> = [
+export const COLUMN_NAMES: Array<IColumn> = [
   {
     id: COLUMN_IDS.DO_IT,
     title: 'Do it',
@@ -24,19 +15,13 @@ export const COLUMN_NAMES: Array<Column> = [
   },
 ]
 
-export const defaultTasks = [
-  { id: '1', text: 'one' },
-  { id: '2', text: 'two' },
-  { id: '3', text: 'three' },
-  { id: '4', text: 'four' },
+export const defaultTasks: Array<ICard> = [
+  { id: '1', text: 'one', column: COLUMN_IDS.DO_IT },
+  { id: '2', text: 'two', column: COLUMN_IDS.DO_IT },
+  { id: '3', text: 'three', column: COLUMN_IDS.IN_PROGRESS },
+  { id: '4', text: 'four', column: COLUMN_IDS.AWAITING_REVIEW },
 ]
 
 export const ItemTypes = {
   CARD: 'card',
-}
-
-export type Card = {
-  id: string
-  text: string
-  // column: COLUMN_IDS
 }

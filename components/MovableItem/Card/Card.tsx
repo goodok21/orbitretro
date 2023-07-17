@@ -1,7 +1,7 @@
 import { forwardRef } from 'react'
-import { Card } from './../../../constants'
+import { ICard } from 'types'
 
-const Card = forwardRef<any, Card>(({ text, ...props }, ref) => {
+const Card = forwardRef<any, ICard>(({ text, ...props }, ref) => {
   return (
     <div className="flex justify-items-stretch" ref={ref} {...props}>
       <div className="block p-6 rounded-lg shadow-card bg-white">

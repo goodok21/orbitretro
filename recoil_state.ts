@@ -1,4 +1,5 @@
-import { Card, COLUMN_NAMES, defaultTasks } from './constants'
+import { ICard } from 'types'
+import { COLUMN_NAMES, defaultTasks } from './constants'
 import { atom, selector } from 'recoil'
 
 export const columnListState = atom({
@@ -6,7 +7,7 @@ export const columnListState = atom({
   default: COLUMN_NAMES,
 })
 
-export const cardListState = atom<Array<Card>>({
+export const cardListState = atom<Array<ICard>>({
   key: 'cardListState',
   default: defaultTasks,
 })

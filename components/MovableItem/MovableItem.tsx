@@ -1,42 +1,17 @@
 import { useRef } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
-import { COLUMN_IDS, ItemTypes } from '../../constants'
+import { ItemTypes } from '../../constants'
 import Card from './Card'
 
+import { ICard } from 'types'
+
 const MovableItem = ({
-  name,
+  id,
+  text,
+  column,
   index,
-  currentColumnName,
   moveCardHandler,
-  setItems,
-}: any) => {
-  const changeItemColumn = (currentItem, columnName) => {
-    console.log(
-      '🚀 ~ file: MovableItem.tsx:14 ~ changeItemColumn ~ columnName',
-      columnName
-    )
-
-    setItems((prevState) => {
-      return prevState
-        .sort(({ column: a }, { column: b }) => {
-          if (a < b) {
-            return -1
-          }
-          if (a > b) {
-            return 1
-          }
-
-          return 0
-        })
-        .map((item) => {
-          return {
-            ...item,
-            column: item.name === currentItem.name ? columnName : item.column,
-          }
-        })
-    })
-  }
-
+}: ICard & { index: number; moveCardHandler: any }) => {
   const ref = useRef(null)
 
   const [, drop] = useDrop({
@@ -83,32 +58,22 @@ const MovableItem = ({
     },
   })
 
-  const [{ isDragging }, drag] = useDrag({
-    item: { index, name, currentColumnName, type: ItemTypes.CARD },
-    end: (item, monitor) => {
-      const dropResult: any = monitor.getDropResult()
+  const changeItemColumn = (currentItem, columnName) => {
+    console.log(currentItem, columnName)
+  }
 
-      if (dropResult) {
-        const { name } = dropResult
-        if (name) {
-          changeItemColumn(item, COLUMN_IDS[name])
-        }
-        // const { DO_IT, IN_PROGRESS, AWAITING_REVIEW } = COLUMN_NAMES
-        // switch (name) {
-        //   case COLUMN_IDS.DO_IT:
-        //     changeItemColumn(item, COLUMN_IDS.DO_IT)
-        //     break
-        //   case COLUMN_IDS.IN_PROGRESS:
-        //     changeItemColumn(item, COL)
-        //     break
-        //   case DO_IT:
-        //     changeItemColumn(item, DO_IT)
-        //     break
-        //   default:
-        //     break
-        // }
-      }
-    },
+  const [{ isDragging }, drag] = useDrag({
+    item: { index, text, column, type: ItemTypes.CARD },
+    // end: (item, monitor) => {
+    //   const dropResult: any = monitor.getDropResult()
+
+    //   if (dropResult) {
+    //     const { name } = dropResult
+    //     if (name) {
+    //       changeItemColumn(item, name)
+    //     }
+    //   }
+    // },
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
@@ -122,7 +87,7 @@ const MovableItem = ({
 
   return (
     <div ref={ref} style={{ opacity }}>
-      <Card title={name} />
+      <Card id={id} text={text} column={column} />
     </div>
   )
 }
